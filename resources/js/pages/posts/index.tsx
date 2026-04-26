@@ -29,7 +29,7 @@ export default function PostsIndex({ posts }: PostsIndexProps)
                                     </CardTitle>
 
                                     <CardDescription>
-                                        By {post.user.name}
+                                        By {post.user?.name}
                                     </CardDescription>
                                 </CardHeader>
 
