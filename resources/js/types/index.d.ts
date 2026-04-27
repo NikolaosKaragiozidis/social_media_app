@@ -31,3 +31,33 @@ export interface Comment {
     user?: User;
     post?: Post;
 }
+
+export interface Like {
+    id: number;
+    post_id: number;
+    ip_address: string;
+    user_agent: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface PostLikesData {
+    count: number;
+    user_has_liked: boolean;
+}
+
+export interface PageProps {
+    auth: {
+        user: User | null;
+        can: {
+            post: {
+                create: boolean;
+            };
+        };
+    };
+    flash: {
+        success?: string;
+        error?: string;
+    };
+    [key: string]: any;
+}
