@@ -31,9 +31,8 @@ export default function CommentForm({ postId, onCommentAdded }: CommentFormProps
                     action={store()}
                     className="space-y-4"
                     resetOnSuccess
-                    onStart={() => onCommentAdded?.()}
-                    options={{
-                        only: ["comments"]
+                    onSuccess={() => {
+                        onCommentAdded?.();
                     }}
                 >
                     {({errors, processing}) => (

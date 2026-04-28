@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCommentRequest;
 use App\Models\Comment;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 
 class CommentController extends Controller
@@ -17,7 +16,7 @@ class CommentController extends Controller
         $validated = $request->validated();
         Comment::create([
             ...$validated,
-            'user_id' => $request->user(),
+            'user_id' => $request->user()->id,
         ]);
 
         return redirect()->back();

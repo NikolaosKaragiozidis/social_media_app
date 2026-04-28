@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -13,7 +13,12 @@ class PostController extends Controller
 {
     public function index(): Response {
         return Inertia::render('posts/index', [
-            'posts' => Post::with('user')->withCount('likes')->latest()->get()
+            'posts' => Inertia::scroll(
+                fn () => Post::with('user')
+                    ->withCount('likes')
+                    ->latest()
+                    ->cursorPaginate(10)
+            ),
         ]);
     }
 
@@ -22,21 +27,22 @@ class PostController extends Controller
 
         return Inertia::render('posts/show', [
             'post' => $post,
-            'comments' => Inertia::defer(
+            'comments' => Inertia::scroll(
                 fn() => $post->comments()
                     ->with('user')
                     ->latest()
-                    ->get()
+                    ->cursorPaginate(3)
             ),
+
+            'comments_count' => Inertia::defer(fn() => $post->comments()->count()),
+
             'likes' => Inertia::defer(
                 fn() => [
                     'count' => $post->likes()->count(),
-                    'user_has_liked' => $post->likes()->where([
-                        'ip_address' => request()->ip(),
-                        'user_agent' => request()->userAgent()
-                    ])->exists()
+                    'user_has_liked' => Auth::check() ?
+                        $post->likes()->where('user_id', Auth::id())->exists() : false,
                 ]
-            )
+            ),
         ]);
     }
 
@@ -52,7 +58,7 @@ class PostController extends Controller
 
         Post::create([
             ...$validated,
-            'user_id' => $request->user(),
+            'user_id' => $request->user()->id,
         ]);
 
         return redirect('/posts');

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import CommentCard from "@/components/comment-card";
 import CommentForm from "@/components/comment-form";
-import {Deferred, usePoll} from "@inertiajs/react";
+import {Deferred, InfiniteScroll, router, usePage, usePoll} from "@inertiajs/react";
 import {useEffect, useRef} from "react";
 import {toast} from "sonner";
 import CommentList from "@/components/comment-list";
@@ -17,15 +17,19 @@ import LikeButton from "@/components/like-button";
 
 interface PostsShowProps {
     post: Post;
-    comments: Comment[];
+    comments: {
+        data: Comment[];
+    };
     likes: PostLikesData;
+    comments_count?: number;
 }
 
-export default function PostsShow({ post, comments, likes }: PostsShowProps)
+export default function PostsShow({ post, comments, likes, comments_count }: PostsShowProps)
 {
     const commentsSectionRef = useRef<HTMLDivElement>(null);
-    const commentCountRef = useRef(comments?.length ?? 0);
+    const commentCountRef = useRef(comments_count ?? 0);
     const imCommentAuthor = useRef(false);
+    const { url } = usePage();
 
     const scrollToComments = () =>
         commentsSectionRef.current?.scrollIntoView({
@@ -34,11 +38,11 @@ export default function PostsShow({ post, comments, likes }: PostsShowProps)
         });
 
     usePoll(3000, {
-        only: ["comments", "likes"],
+        only: ["comments_count", "likes"],
     });
 
     useEffect(() => {
-        const newCommentCount = comments?.length ?? 0;
+        const newCommentCount = comments_count ?? 0;
 
         if (newCommentCount > commentCountRef.current) {
             if (commentCountRef.current > 0 && !imCommentAuthor.current) {
@@ -46,7 +50,14 @@ export default function PostsShow({ post, comments, likes }: PostsShowProps)
                     duration: 6000,
                     action: {
                         label: "View Comments",
-                        onClick: scrollToComments,
+                        onClick: () => {
+                            router.visit(url, {
+                                only: ["comments"],
+                                reset: ["comments"],
+                                preserveScroll: false,
+                                onSuccess: () => scrollToComments(),
+                            });
+                        },
                     }
                 });
             }
@@ -55,7 +66,7 @@ export default function PostsShow({ post, comments, likes }: PostsShowProps)
             imCommentAuthor.current = false;
         }
 
-    }, [comments]);
+    }, [comments_count]);
 
     const handleCommentAdded = () => {
         imCommentAuthor.current = true;
@@ -63,6 +74,12 @@ export default function PostsShow({ post, comments, likes }: PostsShowProps)
         toast("Comment has been added", {
             description: "Your comment is already live and visible",
         });
+
+        router.visit(url, {
+            only: ["comments"],
+            reset: ["comments"],
+            preserveState: true,
+        })
     };
 
     return (
@@ -109,12 +126,9 @@ export default function PostsShow({ post, comments, likes }: PostsShowProps)
 
                 {/* Comments Section */}
                 <div ref={commentsSectionRef}>
-                    <Deferred
-                        data="comments"
-                        fallback={<CommentList comments={comments} />}
-                    >
-                        <CommentList comments={comments} />
-                    </Deferred>
+                    <InfiniteScroll data="comments">
+                        <CommentList comments={comments.data} />
+                    </InfiniteScroll>
                 </div>
             </div>
         </AppLayout>
