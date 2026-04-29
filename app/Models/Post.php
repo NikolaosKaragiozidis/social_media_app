@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Post extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'body', 'user_id', 'ip_address', 'user_agent'];
+
+    protected $fillable = ['title', 'body', 'user_id'];
 
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);

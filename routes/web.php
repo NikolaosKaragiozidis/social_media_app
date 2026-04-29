@@ -25,9 +25,13 @@ Route::delete('/auth/logout', [LoginController::class, 'destroy']);
 
 Route::post('/posts/{post}/likes/toggle', PostToggleLike::class)->middleware('auth');
 
-Route::get('/posts/create', [PostController::class, 'create']);
+Route::get('/posts/create', [PostController::class, 'create'])->middleware('auth');
 Route::get('/posts', [PostController::class, 'index']);
-Route::get('/posts/{id}', [PostController::class, 'show']);
-Route::post('/posts', [PostController::class, 'store']);
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+Route::post('/posts', [PostController::class, 'store'])->middleware('auth');
 
-Route::post('/comments', [CommentController::class, 'store']);
+Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->middleware('auth')->name('posts.edit');
+Route::put('/posts/{post}', [PostController::class, 'update'])->middleware('auth')->name('posts.update');
+Route::delete('/posts/{post}', [PostController::class, 'destroy'])->middleware('auth')->name('posts.destroy');
+
+Route::post('/comments', [CommentController::class, 'store'])->middleware('auth');

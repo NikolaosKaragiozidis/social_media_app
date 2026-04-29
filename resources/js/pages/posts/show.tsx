@@ -14,6 +14,7 @@ import {useEffect, useRef} from "react";
 import {toast} from "sonner";
 import CommentList from "@/components/comment-list";
 import LikeButton from "@/components/like-button";
+import PostActionsDropdown from "@/components/post-actions-dropdown";
 
 interface PostsShowProps {
     post: Post;
@@ -22,9 +23,13 @@ interface PostsShowProps {
     };
     likes: PostLikesData;
     comments_count?: number;
+    can: {
+        update: boolean;
+        delete: boolean;
+    }
 }
 
-export default function PostsShow({ post, comments, likes, comments_count }: PostsShowProps)
+export default function PostsShow({ post, comments, likes, comments_count, can }: PostsShowProps)
 {
     const commentsSectionRef = useRef<HTMLDivElement>(null);
     const commentCountRef = useRef(comments_count ?? 0);
@@ -87,13 +92,18 @@ export default function PostsShow({ post, comments, likes, comments_count }: Pos
             <div className="space-y-6">
                 <Card className="rounded-none">
                     <CardHeader>
-                        <CardTitle className="text-2xl">
-                            {post.title}
-                        </CardTitle>
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <CardTitle className="text-2xl">
+                                    {post.title}
+                                </CardTitle>
 
-                        <CardDescription>
-                            By {post.user?.name} on {" "} {new Date(post.created_at).toLocaleDateString()}
-                        </CardDescription>
+                                <CardDescription>
+                                    By {post.user?.name} on {" "} {new Date(post.created_at).toLocaleDateString()}
+                                </CardDescription>
+                            </div>
+                            <PostActionsDropdown postId={post.id} canUpdate={can.update} canDelete={can.delete} />
+                        </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <p className="text-gray-700 whitespace-pre-wrap">
