@@ -8,6 +8,7 @@ import home from "@/routes/home";
 import about from "@/routes/about";
 import {PageProps} from "@/types";
 import UserDropdown from "@/components/user-dropdown";
+import {Bookmark} from "lucide-react";
 
 export default function AppHeader() {
     const {auth} = usePage<PageProps>().props;
@@ -25,6 +26,7 @@ export default function AppHeader() {
                     <AppHeaderLink href={home.index().url}>Home</AppHeaderLink>
                     <AppHeaderLink href={about.index().url}>About</AppHeaderLink>
                     <AppHeaderLink href={index().url}>Posts</AppHeaderLink>
+                    <AppHeaderLink href={route('saved.index')}>Saved Posts</AppHeaderLink>
 
                     {auth.user ? (
                         <UserDropdown />

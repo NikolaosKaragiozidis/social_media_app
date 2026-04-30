@@ -9,6 +9,7 @@ export interface Post {
     comments?: Comment[];
     likes?: Like[];
     likes_count?: number;
+    is_saved: boolean;
 }
 
 export interface User {

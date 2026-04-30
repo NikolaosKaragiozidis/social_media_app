@@ -17,6 +17,9 @@ class PostController extends Controller
             'posts' => Inertia::scroll(
                 fn () => Post::with('user')
                     ->withCount('likes')
+                    ->withExists(['savedByUsers as is_saved' => function ($query) {
+                        $query->where('user_id', auth()->id());
+                    }])
                     ->latest()
                     ->cursorPaginate(10)
             ),
@@ -24,7 +27,11 @@ class PostController extends Controller
     }
 
     public function show(string $id): Response {
-        $post = Post::with('user')->findorFail($id);
+        $post = Post::with('user')
+            ->withExists(['savedByUsers as is_saved' => function ($query) {
+                $query->where('user_id', Auth::id());
+            }])
+            ->findOrFail($id);
 
         return Inertia::render('posts/show', [
             'post' => $post,
@@ -44,8 +51,7 @@ class PostController extends Controller
             'likes' => Inertia::defer(
                 fn() => [
                     'count' => $post->likes()->count(),
-                    'user_has_liked' => Auth::check() ?
-                        $post->likes()->where('user_id', Auth::id())->exists() : false,
+                    'user_has_liked' => Auth::check() && $post->likes()->where('user_id', Auth::id())->exists(),
                 ]
             ),
         ]);

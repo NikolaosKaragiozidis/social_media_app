@@ -1,8 +1,7 @@
 import AppLayout from "@/layouts/app-layout";
-import {Post} from "@/types";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {Heart} from "lucide-react";
-import { InfiniteScroll, Link} from "@inertiajs/react";
+import { Post } from "@/types";
+import { InfiniteScroll } from "@inertiajs/react";
+import PostCard from "@/components/post-card";
 
 interface PostsIndexProps {
     posts: { data: Post[] };
@@ -22,30 +21,7 @@ export default function PostsIndex({ posts }: PostsIndexProps)
                     <div>
                         <InfiniteScroll data="posts">
                             {posts.data.map(post => (
-                                <Card key={post.id} className="rounded-none border-b-0">
-                                    <CardHeader>
-                                        <CardTitle>
-                                            <Link href={`/posts/${post.id}`}>
-                                                {post.title}
-                                            </Link>
-                                        </CardTitle>
-
-                                        <CardDescription>
-                                            By {post.user?.name}
-                                        </CardDescription>
-                                    </CardHeader>
-
-                                    <CardContent className="space-y-4">
-                                        <p>
-                                            {post.body.substring(0, 200)}
-                                            {post.body.length > 200 && "..."}
-                                        </p>
-                                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                                            <Heart size={16} className="text-gray-400" />
-                                            <span>{post.likes_count ?? 0} likes</span>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                <PostCard key={post.id} post={post} />
                             ))}
                         </InfiniteScroll>
                     </div>

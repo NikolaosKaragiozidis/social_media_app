@@ -7,7 +7,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import CommentCard from "@/components/comment-card";
 import CommentForm from "@/components/comment-form";
 import {Deferred, InfiniteScroll, router, usePage, usePoll} from "@inertiajs/react";
 import {useEffect, useRef} from "react";
@@ -15,6 +14,9 @@ import {toast} from "sonner";
 import CommentList from "@/components/comment-list";
 import LikeButton from "@/components/like-button";
 import PostActionsDropdown from "@/components/post-actions-dropdown";
+import { Bookmark } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import savePost from "@/actions/App/Http/Controllers/PostToggleSave";
 
 interface PostsShowProps {
     post: Post;
@@ -87,6 +89,10 @@ export default function PostsShow({ post, comments, likes, comments_count, can }
         })
     };
 
+    const handleToggleSave = () => {
+        router.post(savePost(post.id), {}, { preserveScroll: true });
+    };
+
     return (
         <AppLayout>
             <div className="space-y-6">
@@ -102,7 +108,20 @@ export default function PostsShow({ post, comments, likes, comments_count, can }
                                     By {post.user?.name} on {" "} {new Date(post.created_at).toLocaleDateString()}
                                 </CardDescription>
                             </div>
-                            <PostActionsDropdown postId={post.id} canUpdate={can.update} canDelete={can.delete} />
+
+                            <div className="flex items-center gap-2">
+                                <Button variant="ghost" size="sm" onClick={handleToggleSave}>
+                                    <Bookmark
+                                        className={`h-4 w-4 ${post.is_saved ? 'fill-current text-primary' : 'text-gray-500'}`}
+                                    />
+                                </Button>
+
+                                <PostActionsDropdown
+                                    postId={post.id}
+                                    canUpdate={can.update}
+                                    canDelete={can.delete}
+                                />
+                            </div>
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
